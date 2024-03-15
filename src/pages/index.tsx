@@ -82,45 +82,43 @@ export default function Home() {
     }
   };
 
-  const handleUpload = async (academyId: string) => {
+  const handleUpload = async (wall_id: string) => {
     if (!file) {
       alert("Por favor, selecione um arquivo para fazer upload.");
       return;
     }
-
+  
     try {
-      // Assumindo que o arquivo é JSON, podemos usar uma extensão .json fixa
-      const fileName = `${uuidv4()}.json`;
-
+      const filePath = `${wall_id}.json`;
+  
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('walls')
-        // Configurar 'file' como Blob com tipo 'application/json'
-        .upload(fileName, file, {
+        .upload(filePath, file, {
           contentType: 'application/json',
-          upsert: false,
+          upsert: true,
         });
-
+  
       if (uploadError) {
         throw new Error('Erro ao fazer upload do arquivo: ' + uploadError.message);
       }
-
+  
       const { data: urlData } = await supabase.storage
         .from('walls')
-        .getPublicUrl(fileName);
-
+        .getPublicUrl(filePath);
+  
       if (!urlData) {
         throw new Error('Erro ao obter URL pública do arquivo.');
       }
-
+  
       const publicUrl = urlData.publicUrl;
-      console.log('PublicUrl: ', publicUrl);
-      setUploadUrl(publicUrl); // Certifique-se de atualizar o estado com a URL do arquivo carregado
+      setUploadUrl(publicUrl); 
       return publicUrl;
-
+  
     } catch (error) {
       console.error('Erro durante o processo de upload:', error);
     }
   };
+  
 
   return (
     <>
